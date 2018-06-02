@@ -18,8 +18,8 @@
 
 package com.teamten.font;
 
+import com.google.common.io.Files;
 import com.teamten.typeset.Ligatures;
-import org.apache.commons.io.FilenameUtils;
 import org.apache.fontbox.ttf.CmapSubtable;
 import org.apache.fontbox.ttf.CmapTable;
 import org.apache.fontbox.ttf.GlyphData;
@@ -130,7 +130,7 @@ public class PdfBoxFont extends AbstractFont {
      */
     @Override
     public String toString() {
-        return FilenameUtils.getBaseName(mFile.getName());
+        return Files.getNameWithoutExtension(mFile.getName());
     }
 
     /**

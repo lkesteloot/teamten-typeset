@@ -90,8 +90,9 @@ public class HyphenDictionaryTest {
         HyphenDictionary d = HyphenDictionary.fromResource("fr");
 
         // This was once a problem where the hyphenator returned "su", "per", "-", "confort". The hyphen
-        // should be with the "per".
-        checkHyphenation(d, "super-confort", "su", "per-", "confort");
+        // should be with the "per". Also we've changed the minimum number of
+        // letters, so it's now just two fragments.
+        checkHyphenation(d, "super-confort", "super-", "confort");
     }
 
     @Test
