@@ -106,6 +106,8 @@ Commands to the system can be embedded in brackets:
 
     [TODO anything] Ignored, for making notes to oneself.
 
+    [open-bracket] Insert an open bracket.
+
 Generally the start of the book will have a list of variables, followed by:
 
     [HALF-TITLE]

@@ -308,6 +308,11 @@ public class MarkdownParser {
                                 flags = FontVariantFlags.PLAIN;
                             }
                             doc.addBlock(new Block.Builder(tagBlockType, lineNumber).build());
+                        } else if (tag.equals("open-bracket")) {
+                            if (builder == null) {
+                                builder = new Block.Builder(blockType, lineNumber);
+                            }
+                            builder.addText('[', flags);
                         } else if (tag.equals("sc")) {
                             if (flags.isSmallCaps()) {
                                 System.out.println("Warning (line " + lineNumber + "): [sc] within [sc]");
