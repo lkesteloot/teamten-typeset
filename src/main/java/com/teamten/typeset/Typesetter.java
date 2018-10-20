@@ -124,32 +124,22 @@ public class Typesetter {
         // Load the hyphenation dictionary.
         String language = config.getString(Config.Key.LANGUAGE);
         if (language == null) {
-            language = "en";
+            language = "en_US";
         }
         HyphenDictionary hyphenDictionary;
         try {
             hyphenDictionary = HyphenDictionary.fromResource(language);
         } catch (FileNotFoundException e) {
-            System.out.printf("Warning: No hyphenation dictionary for language \"" + language + "\"\n");
+            System.out.println("Warning: No hyphenation dictionary for language \"" + language + "\"");
             // Hyphenation won't happen.
             hyphenDictionary = null;
         }
 
-        // Get a locale for sorting.
-        Collator collator;
-        switch (language) {
-            case "en":
-                collator = Collator.getInstance(Locale.US);
-                break;
+        // Get a locale for language.
+        Locale locale = Locale.forLanguageTag(language);
 
-            case "fr":
-                collator = Collator.getInstance(Locale.FRENCH);
-                break;
-
-            default:
-                throw new IllegalStateException("Unknown language \"" + language + "\" for collation");
-        }
-
+        // Get collator for sorting.
+        Collator collator = Collator.getInstance(locale);
 
         // Do several passes at laying out the book until the page numbers stabilize.
         List<Page> pages = null;

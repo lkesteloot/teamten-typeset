@@ -143,7 +143,7 @@ The following variables have arbitrary text for values:
     Colophon (e.g., "First edition, November 1859")
     Toc-Title (e.g., "Table of Contents")
     Index-Title (e.g., "Index")
-    Language (e.g., "en" or "fr")
+    Language (e.g., "en_US" or "fr")
 
 The language sets which hyphenation dictionary is used.
 
