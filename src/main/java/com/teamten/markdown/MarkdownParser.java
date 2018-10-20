@@ -323,6 +323,16 @@ public class MarkdownParser {
                                 System.out.println("Warning (line " + lineNumber + "): [/sc] not within [sc]");
                             }
                             flags = flags.withSmallCaps(false);
+                        } else if (tag.equals("i")) {
+                            if (flags.isItalic()) {
+                                System.out.println("Warning (line " + lineNumber + "): [i] within [i]");
+                            }
+                            flags = flags.withItalic(true);
+                        } else if (tag.equals("/i")) {
+                            if (!flags.isItalic()) {
+                                System.out.println("Warning (line " + lineNumber + "): [/i] not within [i]");
+                            }
+                            flags = flags.withItalic(false);
                         } else if (addMetadataTag(tag, doc)) {
                             // Nothing to do, the method added it.
                         } else if (tag.startsWith("@")) {

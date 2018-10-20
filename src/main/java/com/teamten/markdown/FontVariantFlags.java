@@ -51,6 +51,10 @@ public class FontVariantFlags {
         return new FontVariantFlags(mBold, mItalic, smallCaps, mCode);
     }
 
+    public FontVariantFlags withItalic(boolean italic) {
+        return new FontVariantFlags(mBold, italic, mSmallCaps, mCode);
+    }
+
     public FontVariantFlags toggleCode() {
         return new FontVariantFlags(mBold, mItalic, mSmallCaps, !mCode);
     }

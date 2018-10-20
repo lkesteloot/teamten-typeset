@@ -17,9 +17,9 @@ book.
 The input format is Markdown-inspired. The support for code markup is
 experimental and was never used for a real book.
 
-    Write in *italics*, [sc]small caps[/sc], and `code`.
-    There's no bold support. You can continue a paragraph
-    onto the next line.
+    Write in *italics* or [i]italics[/i], [sc]small caps[/sc],
+    and `code`. There's no bold support. You can continue a
+    paragraph onto the next line.
 
     Separate paragraphs by blank lines.
 
