@@ -18,6 +18,8 @@
 
 package com.teamten.font;
 
+import com.teamten.typeset.Config;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
@@ -26,6 +28,7 @@ import java.util.function.Function;
  * Loads and manages fonts.
  */
 public class FontManager {
+    private final Config mConfig;
     private final Function<TypefaceVariant,Font> mFontLoader;
     private final Map<TypefaceVariant,Font> mFontCache = new HashMap<>();
 
@@ -33,7 +36,8 @@ public class FontManager {
      * A font manager that creates new fonts from the specified font loader. The font loader should
      * throw an IllegalArgumentException if the font cannot be loaded.
      */
-    public FontManager(Function<TypefaceVariant,Font> fontLoader) {
+    public FontManager(Config config, Function<TypefaceVariant,Font> fontLoader) {
+        mConfig = config;
         mFontLoader = fontLoader;
     }
 
@@ -61,6 +65,13 @@ public class FontManager {
      */
     public SizedFont get(TypefaceVariantSize typefaceVariantSize) {
         Font font = get((TypefaceVariant) typefaceVariantSize);
+
+        // See if we should make it a failover font.
+        Typeface fallbackTypeface = mConfig.getTypeface(Config.Key.FALLBACK_TYPEFACE);
+        if (fallbackTypeface != null) {
+            Font fallbackFont = get(typefaceVariantSize.withTypeface(fallbackTypeface));
+            font = new FailoverFont(font, fallbackFont);
+        }
 
         return new SizedFont(font, typefaceVariantSize.getSize());
     }

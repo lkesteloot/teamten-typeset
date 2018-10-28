@@ -18,6 +18,7 @@
 
 package com.teamten.typeset;
 
+import com.teamten.font.Typeface;
 import com.teamten.font.TypefaceVariantSize;
 
 import java.util.HashMap;
@@ -46,6 +47,11 @@ public class Config {
          * Value is a TypefaceVariantSize.
          */
         FONT,
+
+        /**
+         * Typeface name only.
+         */
+        TYPEFACE,
 
         /**
          * Value is a Long in scaled points.
@@ -92,6 +98,9 @@ public class Config {
         TOC_PAGE_PART_FONT(KeyType.FONT),
         TOC_PAGE_CHAPTER_FONT(KeyType.FONT),
         FOOTNOTE_NUMBER_FONT(KeyType.FONT),
+
+        // Typefaces.
+        FALLBACK_TYPEFACE(KeyType.TYPEFACE),
 
         // Distances.
         PAGE_WIDTH(KeyType.DISTANCE),
@@ -191,6 +200,19 @@ public class Config {
     }
 
     /**
+     * Adds a typeface value to the configuration.
+     *
+     * @throws IllegalArgumentException if the key is not for typefaces.
+     */
+    public void addTypeface(Key key, Typeface value) {
+        if (key.getKeyType() != KeyType.TYPEFACE) {
+            throw new IllegalArgumentException("key " + key + " is for " + key.getKeyType());
+        }
+
+        mMetadata.put(key, value);
+    }
+
+    /**
      * Adds a distance value to the configuration.
      *
      * @throws IllegalArgumentException if the key is not for distances.
@@ -216,6 +238,10 @@ public class Config {
 
             case FONT:
                 addFont(key, TypefaceVariantSize.valueOf(value));
+                break;
+
+            case TYPEFACE:
+                addTypeface(key, Typeface.parse(value));
                 break;
 
             case DISTANCE:
@@ -251,6 +277,19 @@ public class Config {
         }
 
         return (TypefaceVariantSize) mMetadata.get(key);
+    }
+
+    /**
+     * Gets the typeface value for the key, or null if not in the configuration.
+     *
+     * @throws IllegalArgumentException if the key is not for typefaces.
+     */
+    public Typeface getTypeface(Key key) {
+        if (key.getKeyType() != KeyType.TYPEFACE) {
+            throw new IllegalArgumentException("key " + key + " is for " + key.getKeyType());
+        }
+
+        return (Typeface) mMetadata.get(key);
     }
 
     /**

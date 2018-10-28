@@ -60,6 +60,11 @@ public class TrackingFont extends AbstractFont {
         mSpaceWidth = mUnderlyingFont.getSpaceWidth() + PT.toSp(mTracking);
     }
 
+    @Override
+    public boolean hasCharacter(int ch) {
+        return mUnderlyingFont.hasCharacter(ch);
+    }
+
     /**
      * Utility method to create a SizedFont incorporating the TrackingFont and the same size.
      */

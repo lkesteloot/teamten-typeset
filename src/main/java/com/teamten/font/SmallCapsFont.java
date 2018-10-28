@@ -44,6 +44,11 @@ public class SmallCapsFont extends AbstractFont {
     }
 
     @Override
+    public boolean hasCharacter(int ch) {
+        return mUnderlyingFont.hasCharacter(ch);
+    }
+
+    @Override
     public long getKerning(int leftChar, int rightChar, double fontSize) {
         // Convert each to fake small caps.
         double leftFontSize = fontSize;

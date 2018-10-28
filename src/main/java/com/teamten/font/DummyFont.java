@@ -56,6 +56,11 @@ public class DummyFont extends AbstractFont {
     }
 
     @Override
+    public boolean hasCharacter(int ch) {
+        return true;
+    }
+
+    @Override
     public long getSpaceWidth() {
         return mWidth;
     }

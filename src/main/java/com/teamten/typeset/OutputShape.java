@@ -38,7 +38,7 @@ public class OutputShape {
      * @param secondSize width of the subsequent lines (not including indent).
      * @param secondIndent indent of the subsequent lines.
      */
-    public OutputShape(int firstLength, long firstSize, long firstIndent, long secondSize, long secondIndent) {
+    private OutputShape(int firstLength, long firstSize, long firstIndent, long secondSize, long secondIndent) {
         mFirstLength = firstLength;
         mFirstSize = firstSize;
         mFirstIndent = firstIndent;

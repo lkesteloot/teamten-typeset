@@ -28,6 +28,10 @@ import java.io.IOException;
  */
 public interface Font {
     /**
+     * Whether this font handles this character.
+     */
+    boolean hasCharacter(int ch);
+    /**
      * Get the kerning between the two code points. The result is in scaled points.
      *
      * @param fontSize the size of the font in points.

@@ -97,7 +97,7 @@ Commands to the system can be embedded in brackets:
 
     [^This is a footnote!] Footnote entry.
 
-    [!darwin.jpg|Charles Darwin in 1859.] Photo pathname and an optional caption.
+    [!darwin.jpg Charles Darwin in 1859.] Photo pathname and an optional caption.
 
     [LABEL id] Mark this spot with the specified id (any string). Doesn't
     generate text.

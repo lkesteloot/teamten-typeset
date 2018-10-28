@@ -18,6 +18,7 @@
 
 package com.teamten.font;
 
+import com.teamten.typeset.Config;
 import org.apache.pdfbox.pdmodel.PDDocument;
 
 import java.io.IOException;
@@ -32,8 +33,8 @@ public class PdfBoxFontManager extends FontManager {
     /**
      * A font manager that creates new PdfBox fonts for the specified PDDocument.
      */
-    public PdfBoxFontManager(PDDocument pdDoc) {
-        super((typefaceVariant) -> {
+    public PdfBoxFontManager(Config config, PDDocument pdDoc) {
+        super(config, (typefaceVariant) -> {
             try {
                 // Get the font that maps to this typeface and variant.
                 FontName fontName = typefaceVariant.getFontName();

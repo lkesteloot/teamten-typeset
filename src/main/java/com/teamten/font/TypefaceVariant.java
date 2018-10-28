@@ -52,6 +52,14 @@ public class TypefaceVariant {
         return mTypeface + ", " + mFontVariant;
     }
 
+    /**
+     * Create a new typeface variant with the specified typeface but this
+     * object's variant.
+     */
+    public TypefaceVariant withTypeface(Typeface typeface) {
+        return new TypefaceVariant(typeface, getFontVariant());
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {

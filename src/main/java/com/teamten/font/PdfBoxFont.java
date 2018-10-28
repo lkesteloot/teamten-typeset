@@ -100,6 +100,11 @@ public class PdfBoxFont extends AbstractFont {
         return mPdFont;
     }
 
+    @Override
+    public boolean hasCharacter(int ch) {
+        return mCmapSubtable.getGlyphId(ch) != 0;
+    }
+
     /**
      * Get the kerning between the two code points. The result is in scaled points.
      *
@@ -175,7 +180,12 @@ public class PdfBoxFont extends AbstractFont {
         contents.beginText();
         contents.setFont(getPdFont(), (float) fontSize);
         contents.newLineAtOffset(PT.fromSpAsFloat(x), PT.fromSpAsFloat(y));
-        contents.showText(text);
+        try {
+            contents.showText(text);
+        } catch (IllegalArgumentException e) {
+            // Probably glyph not in the font.
+            System.err.printf("Got exception showing text \"%s\" (%s)%n", text, e.getMessage());
+        }
         contents.endText();
     }
 }

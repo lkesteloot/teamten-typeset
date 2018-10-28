@@ -37,7 +37,7 @@ public class Text extends Box {
     /**
      * Constructor for string of any size.
      */
-    public Text(SizedFont font, String text, long width, long height, long depth) {
+    public Text(@NotNull SizedFont font, @NotNull String text, long width, long height, long depth) {
         super(width, height, depth);
         mFont = font;
         mText = text;
@@ -46,7 +46,7 @@ public class Text extends Box {
     /**
      * Constructor for a string.
      */
-    public Text(String text, SizedFont font) {
+    public Text(@NotNull String text, @NotNull SizedFont font) {
         super(font.getStringMetrics(text));
         mFont = font;
         mText = text;
@@ -55,7 +55,7 @@ public class Text extends Box {
     /**
      * Constructor for single character.
      */
-    public Text(int ch, SizedFont font) {
+    public Text(int ch, @NotNull SizedFont font) {
         super(font.getCharacterMetrics(ch));
         mFont = font;
         mText = CodePoints.toString(ch);
@@ -64,6 +64,7 @@ public class Text extends Box {
     /**
      * The text that this element was constructed with.
      */
+    @NotNull
     public String getText() {
         return mText;
     }
@@ -71,6 +72,7 @@ public class Text extends Box {
     /**
      * The font the text should be displayed in.
      */
+    @NotNull
     public SizedFont getFont() {
         return mFont;
     }

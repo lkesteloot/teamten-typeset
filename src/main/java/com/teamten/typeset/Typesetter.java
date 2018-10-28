@@ -110,11 +110,11 @@ public class Typesetter {
 
     public PDDocument typeset(Doc doc) throws IOException {
         PDDocument pdDoc = new PDDocument();
-        FontManager fontManager = new PdfBoxFontManager(pdDoc);
+        Config config = new Config();
+        FontManager fontManager = new PdfBoxFontManager(config, pdDoc);
         Sections sections = new Sections();
 
         // Add document metadata.
-        Config config = new Config();
         config.fillWithDefaults();
         for (Map.Entry<String,String> entry : doc.getMetadata()) {
             Config.Key key = Config.Key.fromHeader(entry.getKey());

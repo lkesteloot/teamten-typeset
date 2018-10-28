@@ -307,10 +307,10 @@ public class TypesetterTest {
 
     public static void main(String[] args) throws IOException {
         Typesetter typesetter = new Typesetter();
-        PDDocument pdDoc = new PDDocument();
-        FontManager fontManager = new PdfBoxFontManager(pdDoc);
-
         Config config = Config.testConfig();
+        PDDocument pdDoc = new PDDocument();
+        FontManager fontManager = new PdfBoxFontManager(config, pdDoc);
+
         double fontSize = 11;
         SizedFont font = fontManager.get(Typeface.TIMES_NEW_ROMAN, FontVariant.REGULAR, fontSize);
         Sections sections = new Sections();

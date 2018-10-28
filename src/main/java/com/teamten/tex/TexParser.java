@@ -61,10 +61,10 @@ public class TexParser {
         String pdfFilename = args[1];
 
         InputStream inputStream = new FileInputStream(texFilename);
-        PDDocument pdDoc = new PDDocument();
-        FontManager fontManager = new PdfBoxFontManager(pdDoc);
-
         Config config = Config.testConfig();
+        PDDocument pdDoc = new PDDocument();
+        FontManager fontManager = new PdfBoxFontManager(config, pdDoc);
+
         Sections sections = new Sections();
 
         Typesetter typesetter = new Typesetter();
