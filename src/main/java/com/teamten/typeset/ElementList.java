@@ -440,6 +440,9 @@ public abstract class ElementList implements ElementSink {
             // Make a new list with the glue set to specific widths.
             List<Element> fixedElements = chunk.fixed();
 
+            // Reverse right-to-left text, if necessary.
+            fixedElements = reverseRightToLeftText(fixedElements);
+
             // Add indent. We used to do this with a shift, but shifts aren't taken into account
             // when computing the dimensions of the vertical boxes.
             if (indent > 0) {
@@ -503,6 +506,13 @@ public abstract class ElementList implements ElementSink {
         for (Element element : mElements) {
             element.println(stream, indent + "    ");
         }
+    }
+
+    /**
+     * Optional function to reverse any right-to-left text in the list of elements.
+     */
+    protected List<Element> reverseRightToLeftText(List<Element> elements) {
+        return elements;
     }
 
     /**

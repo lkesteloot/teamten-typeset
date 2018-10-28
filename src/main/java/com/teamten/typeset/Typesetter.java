@@ -319,6 +319,7 @@ public class Typesetter {
                                                               HyphenDictionary hyphenDictionary, int footnoteNumber) throws IOException {
         HorizontalList horizontalList;
 
+        // General formatting style of the paragraph.
         if (paragraphStyle.isCenter()) {
             // Headers, etc.
             horizontalList = HorizontalList.centered();

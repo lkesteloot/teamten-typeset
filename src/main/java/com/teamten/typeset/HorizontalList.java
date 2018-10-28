@@ -34,7 +34,6 @@ import com.teamten.typeset.element.Rule;
 import com.teamten.typeset.element.Text;
 import com.teamten.typeset.element.VBox;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Deque;
 import java.util.LinkedList;
@@ -185,11 +184,100 @@ public class HorizontalList extends ElementList {
         return 0;
     }
 
+    @Override
+    protected List<Element> reverseRightToLeftText(List<Element> elements) {
+        // First see if we have any right-to-left characters.
+        boolean containsRightToLeft = false;
+        for (Element element : elements) {
+            if (element instanceof Text) {
+                Text text = (Text) element;
+                if (text.containsRightToLeftText()) {
+                    containsRightToLeft = true;
+                    break;
+                }
+            }
+        }
+
+        // Shortcut if we don't have any right-to-left text.
+        if (!containsRightToLeft) {
+            return elements;
+        }
+
+        // Split all Text objects so that no Text object contains more than
+        // one character. Leave the rest alone.
+        List<Element> singleChars = new ArrayList<>();
+        for (Element element : elements) {
+            if (element instanceof Text) {
+                Text text = (Text) element;
+                text.breakUpInto(singleChars);
+            } else {
+                singleChars.add(element);
+            }
+        }
+
+        // Find sequences of elements that start with a RTL character,
+        // contains only RTL characters, neutral characters, or non-Text
+        // elements, and ends on a RTL character. Reverse them in-place.
+        int firstRtl = -1;
+        int mostRecentRtl = -1;
+        for (int i = 0; i < singleChars.size(); i++) {
+            Element element = singleChars.get(i);
+            if (element instanceof Text) {
+                Text text = (Text) element;
+                Text.CharacterDirection characterDirection = text.getCharacterDirection();
+                switch (characterDirection) {
+                    case LEFT_TO_RIGHT:
+                        // If we were in a RTL section, this ends it.
+                        if (firstRtl != -1) {
+                            // Reverse the RTL section.
+                            reverseSection(singleChars, firstRtl, mostRecentRtl);
+
+                            firstRtl = -1;
+                            mostRecentRtl = -1;
+                        }
+                        break;
+
+                    case NEUTRAL:
+                        // Nothing to do, continue what we were doing.
+                        break;
+
+                    case RIGHT_TO_LEFT:
+                        if (firstRtl == -1) {
+                            // First RTL one we've seen, just remember it.
+                            firstRtl = i;
+                        }
+
+                        // This is the most recent RTL, remember it.
+                        mostRecentRtl = i;
+                        break;
+                }
+            }
+        }
+
+        // If we ended in an RTL section, reverse it.
+        if (firstRtl != -1) {
+            reverseSection(singleChars, firstRtl, mostRecentRtl);
+        }
+
+        // Here we could collapse single-char Text objects into multi-char
+        // Text objects, but I don't see the benefit.
+        return singleChars;
+    }
+
     /**
-     * Add the specified text, in the specified font, to the horizontal list.
+     * Reverse the elements between first and last inclusive.
      */
-    public void addText(String text, SizedFont font) {
-        addText(text, font, null);
+    private void reverseSection(List<Element> elements, int first, int last) {
+        int half = (last - first + 1)/2;
+
+        for (int i = 0; i < half; i++) {
+            int bottom = first + i;
+            int top = last - i;
+
+            Element tmp = elements.get(bottom);
+            elements.set(bottom, elements.get(top));
+            elements.set(top, tmp);
+        }
     }
 
     /**

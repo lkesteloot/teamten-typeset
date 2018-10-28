@@ -26,6 +26,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 import java.io.PrintStream;
+import java.util.Collection;
 
 /**
  * A sequence of characters.
@@ -33,6 +34,8 @@ import java.io.PrintStream;
 public class Text extends Box {
     private final @NotNull SizedFont mFont;
     private final @NotNull String mText;
+    private boolean mContainsRightToLeftText;
+    private boolean mContainsRightToLeftTextIsSet = false;
 
     /**
      * Constructor for string of any size.
@@ -83,6 +86,78 @@ public class Text extends Box {
     public boolean isCompatibleWith(Text other) {
         return mFont.getFont() == other.mFont.getFont() &&
                 DoubleMath.fuzzyEquals(mFont.getSize(), other.mFont.getSize(), 0.001);
+    }
+
+    /**
+     * Whether any character in the text is right-to-left.
+     */
+    public boolean containsRightToLeftText() {
+        if (!mContainsRightToLeftTextIsSet) {
+            // Cache value.
+            mContainsRightToLeftText = false;
+
+            for (int i = 0; i < mText.length(); ) {
+                // Pick out the code point at this location. Could take two chars.
+                int ch = mText.codePointAt(i);
+
+                // Advance to the next code point.
+                i += Character.charCount(ch);
+
+                // See if this character is right-to-left.
+                if (CharacterDirection.forChar(ch) == CharacterDirection.RIGHT_TO_LEFT) {
+                    mContainsRightToLeftText = true;
+                    break;
+                }
+            }
+
+            mContainsRightToLeftTextIsSet = true;
+        }
+
+        return mContainsRightToLeftText;
+    }
+
+    /**
+     * Return the character direction of the Text. The Text must contain
+     * only a single direction throughout.
+     *
+     * @throws IllegalStateException if the Text contains more than one direction.
+     */
+    public CharacterDirection getCharacterDirection() {
+        CharacterDirection characterDirection = null;
+
+        for (int i = 0; i < mText.length(); ) {
+            // Pick out the code point at this location. Could take two chars.
+            int ch = mText.codePointAt(i);
+
+            // Advance to the next code point.
+            i += Character.charCount(ch);
+
+            CharacterDirection newDirection = CharacterDirection.forChar(ch);
+            if (characterDirection == null) {
+                characterDirection = newDirection;
+            } else {
+                if (newDirection != characterDirection) {
+                    throw new IllegalStateException("inconsistent direction in Text");
+                }
+            }
+        }
+
+        return characterDirection;
+    }
+
+    /**
+     * Add one Text object for each character in this object.
+     */
+    public void breakUpInto(Collection<Element> list) {
+        for (int i = 0; i < mText.length(); ) {
+            // Pick out the code point at this location. Could take two chars.
+            int ch = mText.codePointAt(i);
+
+            // Advance to the next code point.
+            i += Character.charCount(ch);
+
+            list.add(new Text(ch, mFont));
+        }
     }
 
     /**
@@ -153,5 +228,34 @@ public class Text extends Box {
         int result = mFont.hashCode();
         result = 31*result + mText.hashCode();
         return result;
+    }
+
+    /**
+     * Encodes a character direction according to the Unicode standard.
+     */
+    public enum CharacterDirection {
+        LEFT_TO_RIGHT, NEUTRAL, RIGHT_TO_LEFT;
+
+        /**
+         * Return the direction for the character.
+         */
+        public static CharacterDirection forChar(int ch) {
+            switch (Character.getDirectionality(ch)) {
+                case Character.DIRECTIONALITY_LEFT_TO_RIGHT:
+                case Character.DIRECTIONALITY_LEFT_TO_RIGHT_EMBEDDING:
+                case Character.DIRECTIONALITY_LEFT_TO_RIGHT_OVERRIDE:
+                    return LEFT_TO_RIGHT;
+
+                case Character.DIRECTIONALITY_RIGHT_TO_LEFT:
+                case Character.DIRECTIONALITY_RIGHT_TO_LEFT_ARABIC:
+                case Character.DIRECTIONALITY_RIGHT_TO_LEFT_EMBEDDING:
+                case Character.DIRECTIONALITY_RIGHT_TO_LEFT_OVERRIDE:
+                    return RIGHT_TO_LEFT;
+
+                default:
+                    // Punctuation, etc.
+                    return NEUTRAL;
+            }
+        }
     }
 }

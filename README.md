@@ -2,7 +2,7 @@
 Book typesetting system written in Java. See the
 [Javadoc](https://lkesteloot.github.io/teamten-typeset/).
 It supports fine typography, ligatures, kerning, automatic hyphenation, table
-of contents, index, photos, cross-references, and footnotes.
+of contents, index, photos, cross-references, footnotes, and right-to-left text.
 It converts a Markdown-inspired text file and generates a PDF. It
 can be used as a stand-alone application or as a library.
 
@@ -245,7 +245,7 @@ Here are the values I used for the book I printed:
     [Page-Margin-Outer: 6pc]
     [Page-Margin-Inner: 8pc]
 
-## Index entries.
+## Index entries
 
 Put index entries in-line:
 
@@ -255,6 +255,13 @@ This will add an entry for "Madeira" referring to this page. Add sub-index
 entries separated by vertical bars:
 
     The insects in Madeira[@Madeira|insects] which are not ground-feeders, ...
+
+## Right-to-left text
+
+Right-to-left text is only minimally supported. Be sure to set the `Fallback-Typeface`
+configuration setting if your main font does not have Hebrew or Arabic glyphs.
+The typesetter does not handle explicit direction codes or Arabic shaping, and
+does not handle parentheses well. Simple embedded Hebrew should work fine.
 
 # License
 
