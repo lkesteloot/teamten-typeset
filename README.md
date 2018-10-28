@@ -1,6 +1,6 @@
 
 Book typesetting system written in Java. See the
-[Javadoc](https://lkesteloot.github.com/teamten-typeset).
+[Javadoc](https://lkesteloot.github.io/teamten-typeset/).
 It supports fine typography, ligatures, kerning, automatic hyphenation, table
 of contents, index, photos, cross-references, and footnotes.
 It converts a Markdown-inspired text file and generates a PDF. It
@@ -178,6 +178,14 @@ the size is a real number followed by a unit, one of
     Toc-Page-Part-Font
     Toc-Page-Chapter-Font
     Footnote-Number-Font
+
+The following variable is a typeface. The value is registered in
+the `font/Typeface` class. It registers a typeface to use when
+a glyph is not present in whatever typeface is supposed to be
+used. This is useful for foreign-language glyphs such as
+Hebrew. Times New Roman is a good typeface to use here.
+
+    Fallback-Typeface
 
 The following variables are distances. A distance is a real
 number followed by a unit, one of `pt`, `pc`, `in`, `cm`,
