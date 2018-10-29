@@ -31,4 +31,10 @@ public class FootnoteSpan extends Span {
     public Block getBlock() {
         return mBlock;
     }
+
+    @Override
+    public void postProcessText(String locale) {
+        super.postProcessText(locale);
+        mBlock.postProcessText(locale);
+    }
 }

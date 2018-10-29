@@ -153,6 +153,7 @@ public class Config {
      * Fill the configuration with default values so that each document doesn't have to define them all.
      */
     public void fillWithDefaults() {
+        add(Key.LANGUAGE, "en");
         add(Key.PAGE_WIDTH, "8.5in");
         add(Key.PAGE_HEIGHT, "11in");
         add(Key.PAGE_MARGIN_TOP, "6pc");

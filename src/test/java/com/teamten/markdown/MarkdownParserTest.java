@@ -75,7 +75,7 @@ public class MarkdownParserTest {
         assertTextSpanEquals(spans.get(0), "Hello *there* my friend", false, false);
 
         // Initial hyphen for conversation.
-        spans = parseStringToBlocks("- Hey there").get(0).getSpans();
+        spans = parseStringToBlocks("- Hey there", "fr").get(0).getSpans();
         assertEquals(1, spans.size());
         assertTextSpanEquals(spans.get(0), "—Hey there", false, false);
         // Space is required:
@@ -115,7 +115,7 @@ public class MarkdownParserTest {
         assertTextSpanEquals(spans.get(0), "\u00A0.\u00A0.\u00A0. there", false, false);
 
         // Before punctuation.
-        spans = parseStringToBlocks("Hello...!").get(0).getSpans();
+        spans = parseStringToBlocks("Hello...!", "fr").get(0).getSpans();
         assertEquals(1, spans.size());
         assertTextSpanEquals(spans.get(0), "Hello\u00A0.\u00A0.\u00A0.\u00A0!", false, false);
     }
@@ -135,18 +135,23 @@ public class MarkdownParserTest {
         assertTextSpanEquals(spans.get(0), "Hello, there.", false, false);
 
         // Colon, semicolon, question mark, and exclamation mark: insert thin space in front.
-        spans = parseStringToBlocks("This: that.").get(0).getSpans();
+        spans = parseStringToBlocks("This: that.", "fr").get(0).getSpans();
         assertEquals(1, spans.size());
         assertTextSpanEquals(spans.get(0), "This\u202F: that.", false, false);
-        spans = parseStringToBlocks("One thing; the other.").get(0).getSpans();
+        spans = parseStringToBlocks("One thing; the other.", "fr").get(0).getSpans();
         assertEquals(1, spans.size());
         assertTextSpanEquals(spans.get(0), "One thing\u202F; the other.", false, false);
-        spans = parseStringToBlocks("Wow!").get(0).getSpans();
+        spans = parseStringToBlocks("Wow!", "fr").get(0).getSpans();
         assertEquals(1, spans.size());
         assertTextSpanEquals(spans.get(0), "Wow\u202F!", false, false);
-        spans = parseStringToBlocks("What?").get(0).getSpans();
+        spans = parseStringToBlocks("What?", "fr").get(0).getSpans();
         assertEquals(1, spans.size());
         assertTextSpanEquals(spans.get(0), "What\u202F?", false, false);
+
+        // English has no space there.
+        spans = parseStringToBlocks("Wow!", "en").get(0).getSpans();
+        assertEquals(1, spans.size());
+        assertTextSpanEquals(spans.get(0), "Wow!", false, false);
     }
 
     @Test
@@ -186,6 +191,17 @@ public class MarkdownParserTest {
     }
 
     private static List<Block> parseStringToBlocks(String input) {
-        return parseStringToDoc(input).getBlocks();
+        return parseStringToBlocks(input, "en");
+    }
+
+    private static List<Block> parseStringToBlocks(String input, String locale) {
+        Doc doc = parseStringToDoc(input);
+
+        // Post-process the blocks to replace apostrophes, quotes, etc.
+        for (Block block : doc.getBlocks()) {
+            block.postProcessText(locale);
+        }
+
+        return doc.getBlocks();
     }
 }

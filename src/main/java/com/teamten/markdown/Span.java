@@ -22,5 +22,12 @@ package com.teamten.markdown;
  * Superclass of all spans.
  */
 public class Span {
-    // No contents.
+    /**
+     * Convert apostrophes, quotes, etc.
+     *
+     * @param locale the locale being processed ("en_US", "fr", etc.).
+     */
+    public void postProcessText(String locale) {
+        // Nothing by default.
+    }
 }

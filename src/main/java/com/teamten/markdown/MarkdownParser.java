@@ -72,6 +72,7 @@ public class MarkdownParser {
         Doc doc = parser.parse(inputStream);
 
         for (Block block : doc.getBlocks()) {
+            block.postProcessText("en");
             System.out.println("Block: " + block);
         }
     }
@@ -451,11 +452,6 @@ public class MarkdownParser {
             doc.addBlock(builder.build());
             builder = null;
             flags = FontVariantFlags.PLAIN;
-        }
-
-        // Post-process the blocks to replace apostrophes, quotes, etc.
-        for (Block block : doc.getBlocks()) {
-            block.postProcessText();
         }
 
         return doc;

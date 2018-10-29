@@ -42,6 +42,14 @@ public class ImageSpan extends Span {
     }
 
     @Override
+    public void postProcessText(String locale) {
+        super.postProcessText(locale);
+        if (mCaption != null) {
+            mCaption.postProcessText(locale);
+        }
+    }
+
+    @Override
     public String toString() {
         return "[!" + mPathname + " " + mCaption + "]";
     }

@@ -121,11 +121,16 @@ public class Typesetter {
             config.add(key, entry.getValue());
         }
 
-        // Load the hyphenation dictionary.
+        // Post-process the blocks to replace apostrophes, quotes, etc.
         String language = config.getString(Config.Key.LANGUAGE);
         if (language == null) {
             language = "en_US";
         }
+        for (Block block : doc.getBlocks()) {
+            block.postProcessText(language);
+        }
+
+        // Load the hyphenation dictionary.
         HyphenDictionary hyphenDictionary;
         try {
             hyphenDictionary = HyphenDictionary.fromResource(language);

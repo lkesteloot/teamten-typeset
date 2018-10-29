@@ -87,14 +87,24 @@ public class Block {
 
     /**
      * Convert apostrophes, quotes, etc.
+     *
+     * @param locale the locale being processed ("en_US", "fr", etc.).
      */
-    public void postProcessText() {
+    public void postProcessText(String locale) {
+        // Some rules are for French only.
+        String language = locale.substring(0, Math.min(2, locale.length()));
+        boolean isFrench = language.equalsIgnoreCase("fr");
+
         if (getBlockType() != BlockType.CODE) {
             boolean insideQuotation = false;
             int previousCh = -1;
 
             for (int i = 0; i < mSpans.size(); i++) {
                 Span span = mSpans.get(i);
+                span.postProcessText(locale);
+
+                // Can't put this into the TextSpan class because we keep track of
+                // the previous character across text spans.
                 if (span instanceof TextSpan) {
                     TextSpan textSpan = (TextSpan) span;
                     StringBuilder builder = new StringBuilder();
@@ -110,10 +120,13 @@ public class Block {
                         } else if (ch == '\'') {
                             builder.append('’');
                         } else if (ch == '"') {
-//                            builder.append(insideQuotation ? '”' : '“');
-                            builder.append(insideQuotation ? "\u00A0»" : "«\u00A0");
+                            if (isFrench) {
+                                builder.append(insideQuotation ? "\u00A0»" : "«\u00A0");
+                            } else {
+                                builder.append(insideQuotation ? '”' : '“');
+                            }
                             insideQuotation = !insideQuotation;
-                        } else if (ch == '-' && i == 0 && j == 0 && text.length() >= 2 && text.codePointAt(j + 1) == ' ') {
+                        } else if (isFrench && ch == '-' && i == 0 && j == 0 && text.length() >= 2 && text.codePointAt(j + 1) == ' ') {
                             // Em-dash for start of dialog.
                             builder.appendCodePoint('—');
 
@@ -126,7 +139,7 @@ public class Block {
 
                             // Skip dots.
                             j += 2;
-                        } else if (ch == ':' || ch == ';' || ch == '!' || ch == '?') {
+                        } else if (isFrench && (ch == ':' || ch == ';' || ch == '!' || ch == '?')) {
                             // In French there's a space before two-part punctuation.
                             if (previousCh == '.') {
                                 // After a period use a full width space (it's probably after ellipsis).

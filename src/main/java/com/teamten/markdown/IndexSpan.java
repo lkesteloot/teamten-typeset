@@ -48,4 +48,13 @@ public class IndexSpan extends Span {
     public List<Block> getEntries() {
         return mEntries;
     }
+
+    @Override
+    public void postProcessText(String locale) {
+        super.postProcessText(locale);
+
+        for (Block block : mEntries) {
+            block.postProcessText(locale);
+        }
+    }
 }

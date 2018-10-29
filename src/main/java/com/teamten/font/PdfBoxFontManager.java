@@ -20,6 +20,7 @@ package com.teamten.font;
 
 import com.teamten.typeset.Config;
 import org.apache.pdfbox.pdmodel.PDDocument;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;
@@ -33,7 +34,7 @@ public class PdfBoxFontManager extends FontManager {
     /**
      * A font manager that creates new PdfBox fonts for the specified PDDocument.
      */
-    public PdfBoxFontManager(Config config, PDDocument pdDoc) {
+    public PdfBoxFontManager(@Nullable Config config, PDDocument pdDoc) {
         super(config, (typefaceVariant) -> {
             try {
                 // Get the font that maps to this typeface and variant.
