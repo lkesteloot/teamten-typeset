@@ -83,7 +83,7 @@ public class Footnote extends VBox {
         }
 
         // Get the style for this paragraph given its block type.
-        ParagraphStyle paragraphStyle = ParagraphStyle.forBlock(block, BlockType.BODY, config, fontManager);
+        ParagraphStyle paragraphStyle = ParagraphStyle.forBlock(block, null, config, fontManager);
 
         // Substitute the footnote font.
         paragraphStyle = paragraphStyle.withScaledFont(FOOTNOTE_FONT_SCALE);

@@ -204,7 +204,7 @@ public class Typesetter {
         VerticalList verticalList = new VerticalList();
         int footnoteNumber = 1;
 
-        BlockType previousBlockType = null;
+        Block previousBlock = null;
         for (Block block : doc.getBlocks()) {
             // Generate special pages (table of contents, index, etc.).
             switch (block.getBlockType()) {
@@ -229,7 +229,7 @@ public class Typesetter {
                     continue;
 
                 case SEPARATOR:
-                    previousBlockType = block.getBlockType();
+                    previousBlock = block;
                     generateSeparator(config, verticalList, fontManager);
                     continue;
 
@@ -251,7 +251,7 @@ public class Typesetter {
             }
 
             // Get the style for this paragraph given its block type.
-            ParagraphStyle paragraphStyle = ParagraphStyle.forBlock(block, previousBlockType, config, fontManager);
+            ParagraphStyle paragraphStyle = ParagraphStyle.forBlock(block, previousBlock, config, fontManager);
 
             // Reset the footnote number at start of chapters.
             if (paragraphStyle.isResetFootnoteNumber()) {
@@ -287,7 +287,7 @@ public class Typesetter {
                 verticalList.oddPage();
                 // Space at the top of the section.
                 verticalList.addElement(new Box(0, IN.toSp(2.0), 0));
-                previousBlockType = null;
+                previousBlock = null;
             } else {
                 // If the paragraph shouldn't have a break after it (e.g., a section title), prohibit
                 // it by having an infinite penalty before the glue.
@@ -304,7 +304,7 @@ public class Typesetter {
                 if (block.getBlockType() != BlockType.POETRY) {
                     verticalList.addElement(new Glue(0, PT.toSp(3), 0, false));
                 }
-                previousBlockType = block.getBlockType();
+                previousBlock = block;
             }
         }
 

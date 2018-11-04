@@ -23,6 +23,7 @@ import com.teamten.font.FontPack;
 import com.teamten.font.TypefaceVariantSize;
 import com.teamten.markdown.Block;
 import com.teamten.markdown.BlockType;
+import org.jetbrains.annotations.Nullable;
 
 import static com.teamten.typeset.SpaceUnit.IN;
 import static com.teamten.typeset.SpaceUnit.PT;
@@ -190,7 +191,7 @@ public class ParagraphStyle {
      * Creates an OutputShape object corresponding to this style for the specified body width.
      */
     public OutputShape makeOutputShape(long bodyWidth) {
-        return OutputShape.singleLine(bodyWidth - mMarginLeft - mMarginRight,
+        return OutputShape.singleLine(bodyWidth - mMarginRight,
                 mFirstLineIndent + mMarginLeft,
                 mSubsequentLinesIndent + mMarginLeft);
     }
@@ -218,7 +219,7 @@ public class ParagraphStyle {
                 mFontPack.withScaledFont(scale));
     }
 
-    public static ParagraphStyle forBlock(Block block, BlockType previousBlockType,
+    public static ParagraphStyle forBlock(Block block, @Nullable Block previousBlock,
                                           Config config, FontManager fontManager) {
 
         Config.Key regularFontKey;
@@ -238,6 +239,7 @@ public class ParagraphStyle {
         int firstLineIndentCount = 0;
         int subsequentLinesIndentCount = 0;
         boolean preventBreak = false;
+        BlockType previousBlockType = previousBlock == null ? null : previousBlock.getBlockType();
 
         switch (block.getBlockType()) {
             case BODY:
@@ -351,7 +353,7 @@ public class ParagraphStyle {
             case SIGNATURE:
                 regularFontKey = Config.Key.BODY_FONT;
                 if (previousBlockType != BlockType.SIGNATURE) {
-                    marginTop = PT.toSp(32.0);
+                    marginTop = PT.toSp(16.0);
                 }
                 firstLineIndentCount = 0;
                 subsequentLinesIndentCount = 0;
@@ -374,6 +376,11 @@ public class ParagraphStyle {
             marginTop = Math.max(marginTop, PT.toSp(8.0));
         }
 
+        // Margin above and below block quotes.
+        if (previousBlock != null && block.isInBlockQuote() != previousBlock.isInBlockQuote()) {
+            marginTop = Math.max(marginTop, PT.toSp(16.0));
+        }
+
         TypefaceVariantSize regularFontDesc = config.getFont(regularFontKey);
         TypefaceVariantSize codeFontDesc = config.getFont(codeFontKey);
 
@@ -385,21 +392,22 @@ public class ParagraphStyle {
             fontPack = fontPack.withTracking(0.1, 0.5);
         }
 
-        // Smaller font for block quotes.
+        // Smaller font and margins for block quotes.
         if (block.isInBlockQuote()) {
-            fontPack = fontPack.withScaledFont(0.8);
-            fontSize *= 0.8;
+            // Base the margins on the indent of the outer (normal) font size.
+            long originalParagraphIndent = PT.toSp(fontSize*2);
+            marginLeft = originalParagraphIndent;
+            marginRight = originalParagraphIndent;
+
+            // Make text smaller.
+            double fontScale = 0.8;
+            fontPack = fontPack.withScaledFont(fontScale);
+            fontSize *= fontScale;
         }
 
         // 135% recommended by http://practicaltypography.com/line-spacing.html
         long leading = PT.toSp(fontSize*1.35f);
         long paragraphIndent = PT.toSp(fontSize*2);
-
-        // Indents for block quotes.
-        if (block.isInBlockQuote()) {
-            marginLeft = paragraphIndent;
-            marginRight = paragraphIndent;
-        }
 
         return new ParagraphStyle(center, newPage, oddPage, ownPage, allowLineBreaks, marginTop,
                 marginBottom, marginLeft, marginRight, resetFootnoteNumber, leading, paragraphIndent,
