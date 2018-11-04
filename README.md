@@ -8,7 +8,7 @@ can be used as a stand-alone application or as a library.
 
 This typesetting system was only used once, to typeset a
 [book written by my great uncle](https://www.teamten.com/lawrence/projects/memoir-book/).
-A few things are hard-coded (rules for French punctuation, minor layout
+A few things are hard-coded (minor layout
 spacing), but it shouldn't be too hard to get it to work for another type of
 book.
 

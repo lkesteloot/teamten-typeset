@@ -18,18 +18,22 @@
 
 package com.teamten.markdown;
 
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
 /**
  * Stores an image and its caption.
  */
 public class ImageSpan extends Span {
-    private final String mPathname;
-    private final Block mCaption;
+    private final @NotNull String mPathname;
+    private final @Nullable Block mCaption;
 
-    public ImageSpan(String pathname, Block caption) {
+    public ImageSpan(@NotNull String pathname, @Nullable Block caption) {
         mPathname = pathname;
         mCaption = caption;
     }
 
+    @NotNull
     public String getPathname() {
         return mPathname;
     }
@@ -37,6 +41,7 @@ public class ImageSpan extends Span {
     /**
      * The caption as a block, or an empty string if none was specified.
      */
+    @Nullable
     public Block getCaption() {
         return mCaption;
     }
@@ -51,6 +56,6 @@ public class ImageSpan extends Span {
 
     @Override
     public String toString() {
-        return "[!" + mPathname + " " + mCaption + "]";
+        return "[!" + mPathname + (mCaption == null ? "" : " " + mCaption) + "]";
     }
 }

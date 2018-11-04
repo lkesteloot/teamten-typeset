@@ -34,6 +34,7 @@ import com.teamten.typeset.VerticalList;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPageContentStream;
 import org.apache.pdfbox.pdmodel.graphics.image.PDImageXObject;
+import org.jetbrains.annotations.Nullable;
 
 import java.awt.image.BufferedImage;
 import java.io.IOException;
@@ -77,7 +78,7 @@ public class Image extends Box {
      * is at the bottom of the image.
      */
     public static Image load(Path imagePath, long maxWidth, long maxHeight,
-                             Block block, Config config, FontManager fontManager,
+                             @Nullable Block block, Config config, FontManager fontManager,
                              Bookmarks bookmarks, Sections sections, HyphenDictionary hyphenDictionary,
                              PDDocument pdDoc) throws IOException {
 
