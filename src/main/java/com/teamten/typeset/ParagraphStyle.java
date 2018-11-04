@@ -38,6 +38,8 @@ public class ParagraphStyle {
     private final boolean mAllowLineBreaks;
     private final long mMarginTop;
     private final long mMarginBottom;
+    private final long mMarginLeft;
+    private final long mMarginRight;
     private final boolean mResetFootnoteNumber;
     private final long mLeading;
     private final long mParagraphIndent;
@@ -48,6 +50,7 @@ public class ParagraphStyle {
 
     public ParagraphStyle(boolean center, boolean newPage, boolean oddPage,
                           boolean ownPage, boolean allowLineBreaks, long marginTop, long marginBottom,
+                          long marginLeft, long marginRight,
                           boolean resetFootnoteNumber, long leading,
                           long paragraphIndent, long firstLineIndent, long subsequentLinesIndent,
                           boolean preventBreak, FontPack fontPack) {
@@ -59,6 +62,8 @@ public class ParagraphStyle {
         mAllowLineBreaks = allowLineBreaks;
         mMarginTop = marginTop;
         mMarginBottom = marginBottom;
+        mMarginLeft = marginLeft;
+        mMarginRight = marginRight;
         mResetFootnoteNumber = resetFootnoteNumber;
         mLeading = leading;
         mParagraphIndent = paragraphIndent;
@@ -118,6 +123,20 @@ public class ParagraphStyle {
     }
 
     /**
+     * The margin to the left of the paragraph, in addition to the various indents.
+     */
+    public long getMarginLeft() {
+        return mMarginLeft;
+    }
+
+    /**
+     * The margin to the right of the paragraph, in addition to the various indents.
+     */
+    public long getMarginRight() {
+        return mMarginRight;
+    }
+
+    /**
      * Whether to reset the footnote number to 1 before processing this paragraph. This is done for
      * new chapters.
      */
@@ -171,7 +190,9 @@ public class ParagraphStyle {
      * Creates an OutputShape object corresponding to this style for the specified body width.
      */
     public OutputShape makeOutputShape(long bodyWidth) {
-        return OutputShape.singleLine(bodyWidth, mFirstLineIndent, mSubsequentLinesIndent);
+        return OutputShape.singleLine(bodyWidth - mMarginLeft - mMarginRight,
+                mFirstLineIndent + mMarginLeft,
+                mSubsequentLinesIndent + mMarginLeft);
     }
 
     /**
@@ -186,6 +207,8 @@ public class ParagraphStyle {
                 mAllowLineBreaks,
                 mMarginTop,
                 mMarginBottom,
+                mMarginLeft,
+                mMarginRight,
                 mResetFootnoteNumber,
                 (long) (mLeading*scale),
                 mParagraphIndent,
@@ -209,6 +232,8 @@ public class ParagraphStyle {
         boolean allowLineBreaks = true;
         long marginTop = 0;
         long marginBottom = 0;
+        long marginLeft = 0;
+        long marginRight = 0;
         boolean resetFootnoteNumber = false;
         int firstLineIndentCount = 0;
         int subsequentLinesIndentCount = 0;
@@ -360,12 +385,24 @@ public class ParagraphStyle {
             fontPack = fontPack.withTracking(0.1, 0.5);
         }
 
+        // Smaller font for block quotes.
+        if (block.isInBlockQuote()) {
+            fontPack = fontPack.withScaledFont(0.8);
+            fontSize *= 0.8;
+        }
+
         // 135% recommended by http://practicaltypography.com/line-spacing.html
         long leading = PT.toSp(fontSize*1.35f);
         long paragraphIndent = PT.toSp(fontSize*2);
 
+        // Indents for block quotes.
+        if (block.isInBlockQuote()) {
+            marginLeft = paragraphIndent;
+            marginRight = paragraphIndent;
+        }
+
         return new ParagraphStyle(center, newPage, oddPage, ownPage, allowLineBreaks, marginTop,
-                marginBottom, resetFootnoteNumber, leading, paragraphIndent,
+                marginBottom, marginLeft, marginRight, resetFootnoteNumber, leading, paragraphIndent,
                 paragraphIndent*firstLineIndentCount,
                 paragraphIndent*subsequentLinesIndentCount, preventBreak,
                 fontPack);
