@@ -39,6 +39,7 @@ public class MarkdownParser {
     private static final Map<String,BlockType> TAG_BLOCK_TYPE_MAP = new HashMap<>();
     private static final Pattern mMetadataPattern = Pattern.compile("([A-Za-z-]+): (.*)");
     private boolean mForceBody;
+    private boolean mInBlockQuote;
 
     private enum ParserState {
         START_OF_LINE,
@@ -79,6 +80,7 @@ public class MarkdownParser {
 
     public MarkdownParser() {
         mForceBody = false;
+        mInBlockQuote = false;
     }
 
     /**
@@ -141,7 +143,7 @@ public class MarkdownParser {
                         // This is a real bullet symbol. On Mac, use Alt-8 to type it.
                         state = ParserState.SKIP_WHITESPACE;
                         blockType = BlockType.BULLET_LIST;
-                        builder = new Block.Builder(blockType, lineNumber);
+                        builder = new Block.Builder(blockType, lineNumber, mInBlockQuote);
                     } else if (builder == null && ch == '#' && blockType == BlockType.BODY && !mForceBody) {
                         blockType = BlockType.PART_HEADER;
                     } else if (builder == null && ch == '#' && blockType == BlockType.PART_HEADER && !mForceBody) {
@@ -170,7 +172,7 @@ public class MarkdownParser {
                         state = ParserState.IN_TAG;
                     } else {
                         if (builder == null) {
-                            builder = new Block.Builder(blockType, lineNumber);
+                            builder = new Block.Builder(blockType, lineNumber, mInBlockQuote);
                         }
                         if (newlineSpace) {
                             builder.addText(' ', newlineSpaceFlags);
@@ -202,22 +204,22 @@ public class MarkdownParser {
                 case THREE_SPACES:
                     if (ch == ' ') {
                         state = ParserState.LINE_OF_CODE;
-                        builder = new Block.Builder(BlockType.CODE, lineNumber);
+                        builder = new Block.Builder(BlockType.CODE, lineNumber, mInBlockQuote);
                     } else if (ch == '>') {
                         state = ParserState.LINE_OF_CODE;
-                        builder = new Block.Builder(BlockType.OUTPUT, lineNumber);
+                        builder = new Block.Builder(BlockType.OUTPUT, lineNumber, mInBlockQuote);
                     } else if (ch == '<') {
                         state = ParserState.LINE_OF_CODE;
-                        builder = new Block.Builder(BlockType.INPUT, lineNumber);
+                        builder = new Block.Builder(BlockType.INPUT, lineNumber, mInBlockQuote);
                     } else if (ch == '/') {
                         state = ParserState.IN_LINE;
-                        builder = new Block.Builder(BlockType.POETRY, lineNumber);
+                        builder = new Block.Builder(BlockType.POETRY, lineNumber, mInBlockQuote);
                     } else if (ch == '"') {
                         state = ParserState.IN_LINE;
-                        builder = new Block.Builder(BlockType.BLOCK_QUOTE, lineNumber);
+                        builder = new Block.Builder(BlockType.BLOCK_QUOTE, lineNumber, mInBlockQuote);
                     } else if (ch == '-') {
                         state = ParserState.IN_LINE;
-                        builder = new Block.Builder(BlockType.SIGNATURE, lineNumber);
+                        builder = new Block.Builder(BlockType.SIGNATURE, lineNumber, mInBlockQuote);
                     } else {
                         state = ParserState.START_OF_LINE;
                         processSameCharacter = true;
@@ -308,10 +310,10 @@ public class MarkdownParser {
                                 builder = null;
                                 flags = FontVariantFlags.PLAIN;
                             }
-                            doc.addBlock(new Block.Builder(tagBlockType, lineNumber).build());
+                            doc.addBlock(new Block.Builder(tagBlockType, lineNumber, mInBlockQuote).build());
                         } else if (tag.equals("open-bracket")) {
                             if (builder == null) {
-                                builder = new Block.Builder(blockType, lineNumber);
+                                builder = new Block.Builder(blockType, lineNumber, mInBlockQuote);
                             }
                             builder.addText('[', flags);
                         } else if (tag.equals("sc")) {
@@ -334,27 +336,37 @@ public class MarkdownParser {
                                 System.out.println("Warning (line " + lineNumber + "): [/i] not within [i]");
                             }
                             flags = flags.withItalic(false);
+                        } else if (tag.equals("blockquote")) {
+                            if (mInBlockQuote) {
+                                System.out.println("Warning (line " + lineNumber + "): [blockquote] within [blockquote]");
+                            }
+                            mInBlockQuote = true;
+                        } else if (tag.equals("/blockquote")) {
+                            if (!mInBlockQuote) {
+                                System.out.println("Warning (line " + lineNumber + "): [/blockquote] not within [blockquote]");
+                            }
+                            mInBlockQuote = false;
                         } else if (addMetadataTag(tag, doc)) {
                             // Nothing to do, the method added it.
                         } else if (tag.startsWith("@")) {
                             // Index entry.
                             if (builder == null) {
                                 // Not tested.
-                                builder = new Block.Builder(blockType, lineNumber);
+                                builder = new Block.Builder(blockType, lineNumber, mInBlockQuote);
                             }
                             builder.addSpan(IndexSpan.fromBarSeparatedEntries(tag.substring(1)));
                         } else if (tag.startsWith("^")) {
                             // Footnote.
                             if (builder == null) {
                                 // Not tested.
-                                builder = new Block.Builder(blockType, lineNumber);
+                                builder = new Block.Builder(blockType, lineNumber, mInBlockQuote);
                             }
                             Block block = parseSingleBlock(tag.substring(1));
                             builder.addSpan(new FootnoteSpan(block));
                         } else if (tag.startsWith("!")) {
                             // Photo.
                             if (builder == null) {
-                                builder = new Block.Builder(blockType, lineNumber);
+                                builder = new Block.Builder(blockType, lineNumber, mInBlockQuote);
                             }
 
                             // Split into filename and the caption.
@@ -368,7 +380,7 @@ public class MarkdownParser {
                         } else if (tag.startsWith("LABEL ")) {
                             // Label that can be referred-to by PAGE-OF.
                             if (builder == null) {
-                                builder = new Block.Builder(blockType, lineNumber);
+                                builder = new Block.Builder(blockType, lineNumber, mInBlockQuote);
                             }
 
                             String name = tag.substring(6).trim();
@@ -376,7 +388,7 @@ public class MarkdownParser {
                         } else if (tag.startsWith("PAGE-OF ")) {
                             // Page of a LABEL.
                             if (builder == null) {
-                                builder = new Block.Builder(blockType, lineNumber);
+                                builder = new Block.Builder(blockType, lineNumber, mInBlockQuote);
                             }
 
                             String name = tag.substring(8).trim();
@@ -407,11 +419,11 @@ public class MarkdownParser {
                     } else if (ch == '.') {
                         // It was a numbered list.
                         int counter = Integer.parseInt(tagBuilder.toString(), 10);
-                        builder = Block.numberedListBuilder(lineNumber, counter);
+                        builder = Block.numberedListBuilder(lineNumber, counter, mInBlockQuote);
                         state = ParserState.SKIP_WHITESPACE;
                     } else {
                         // Wasn't a numbered list. Start a normal paragraph.
-                        builder = new Block.Builder(blockType, lineNumber);
+                        builder = new Block.Builder(blockType, lineNumber, mInBlockQuote);
                         for (int i = 0; i < tagBuilder.length(); i++) {
                             builder.addText(tagBuilder.charAt(i), flags);
                         }
@@ -441,7 +453,7 @@ public class MarkdownParser {
 
         // Check if we were in the middle of parsing a number for a numbered list.
         if (state == ParserState.NUMBERED_LIST) {
-            builder = new Block.Builder(blockType, lineNumber);
+            builder = new Block.Builder(blockType, lineNumber, mInBlockQuote);
             for (int i = 0; i < tagBuilder.length(); i++) {
                 builder.addText(tagBuilder.charAt(i), flags);
             }

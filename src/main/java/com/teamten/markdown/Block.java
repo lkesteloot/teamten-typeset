@@ -31,12 +31,14 @@ public class Block {
     private final @NotNull BlockType mBlockType;
     private final int mLineNumber;
     private final int mCounter;
+    private final boolean mInBlockQuote;
     private final @NotNull List<Span> mSpans = new ArrayList<>();
 
-    public Block(BlockType blockType, int lineNumber, int counter) {
+    public Block(@NotNull BlockType blockType, int lineNumber, int counter, boolean inBlockQuote) {
         mBlockType = blockType;
         mLineNumber = lineNumber;
         mCounter = counter;
+        mInBlockQuote = inBlockQuote;
     }
 
     public BlockType getBlockType() {
@@ -55,6 +57,13 @@ public class Block {
      */
     public int getCounter() {
         return mCounter;
+    }
+
+    /**
+     * Whether this block is inside a blockquote (indented, etc.).
+     */
+    public boolean isInBlockQuote() {
+        return mInBlockQuote;
     }
 
     public List<Span> getSpans() {
@@ -80,7 +89,7 @@ public class Block {
      * Return a copy of this block with a different block type.
      */
     public Block withBlockType(BlockType blockType) {
-        Block newBlock = new Block(blockType, mLineNumber, mCounter);
+        Block newBlock = new Block(blockType, mLineNumber, mCounter, mInBlockQuote);
         newBlock.mSpans.addAll(mSpans);
         return newBlock;
     }
@@ -228,16 +237,16 @@ public class Block {
     /**
      * Make a builder for numbered lists.
      */
-    public static Builder numberedListBuilder(int lineNumber, int counter) {
-        return new Builder(BlockType.NUMBERED_LIST, lineNumber, counter);
+    public static Builder numberedListBuilder(int lineNumber, int counter, boolean inBlockQuote) {
+        return new Builder(BlockType.NUMBERED_LIST, lineNumber, counter, inBlockQuote);
     }
 
     /**
      * Make a plain body block from a string.
      */
-    public static Block bodyBlock(String text) {
+    public static Block bodyBlock(String text, boolean inBlockQuote) {
         Span span = new TextSpan(text, FontVariantFlags.PLAIN);
-        return new Builder(BlockType.BODY, 0).addSpan(span).build();
+        return new Builder(BlockType.BODY, 0, inBlockQuote).addSpan(span).build();
     }
 
     /**
@@ -248,12 +257,12 @@ public class Block {
         private final StringBuilder mStringBuilder = new StringBuilder();
         private FontVariantFlags mFlags = FontVariantFlags.PLAIN;
 
-        private Builder(BlockType blockType, int lineNumber, int counter) {
-            mBlock = new Block(blockType, lineNumber, counter);
+        private Builder(BlockType blockType, int lineNumber, int counter, boolean inBlockQuote) {
+            mBlock = new Block(blockType, lineNumber, counter, inBlockQuote);
         }
 
-        public Builder(BlockType blockType, int lineNumber) {
-            this(blockType, lineNumber, 0);
+        public Builder(BlockType blockType, int lineNumber, boolean inBlockQuote) {
+            this(blockType, lineNumber, 0, inBlockQuote);
         }
 
         public BlockType getBlockType() {

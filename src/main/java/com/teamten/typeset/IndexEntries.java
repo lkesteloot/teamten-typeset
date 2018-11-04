@@ -138,7 +138,7 @@ public class IndexEntries {
                     break;
             }
 
-            IndexEntry indexEntry = new IndexEntry(Block.bodyBlock(word), collator);
+            IndexEntry indexEntry = new IndexEntry(Block.bodyBlock(word, false), collator);
             add(indexEntry);
             count--;
 
