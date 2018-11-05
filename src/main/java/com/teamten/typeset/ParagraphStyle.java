@@ -353,7 +353,7 @@ public class ParagraphStyle {
             case SIGNATURE:
                 regularFontKey = Config.Key.BODY_FONT;
                 if (previousBlockType != BlockType.SIGNATURE) {
-                    marginTop = PT.toSp(16.0);
+                    marginTop = PT.toSp(8.0);
                 }
                 firstLineIndentCount = 0;
                 subsequentLinesIndentCount = 0;

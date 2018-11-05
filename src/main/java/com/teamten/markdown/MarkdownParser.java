@@ -336,6 +336,8 @@ public class MarkdownParser {
                                 System.out.println("Warning (line " + lineNumber + "): [/i] not within [i]");
                             }
                             flags = flags.withItalic(false);
+                        } else if (tag.startsWith("a ") || tag.equals("/a")) {
+                            // Ignore links.
                         } else if (tag.equals("blockquote")) {
                             if (mInBlockQuote) {
                                 System.out.println("Warning (line " + lineNumber + "): [blockquote] within [blockquote]");
