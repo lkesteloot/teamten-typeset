@@ -335,7 +335,7 @@ public class ParagraphStyle {
 
             case INPUT:
                 regularFontKey = Config.Key.INPUT_FONT;
-                if (!previousBlockType.isConsole()) {
+                if (previousBlockType != null && !previousBlockType.isConsole()) {
                     marginTop = PT.toSp(8.0);
                 }
                 firstLineIndentCount = 1;
