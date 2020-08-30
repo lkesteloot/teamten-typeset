@@ -53,6 +53,8 @@ import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.pdmodel.PDPageContentStream;
 import org.apache.pdfbox.pdmodel.common.PDRectangle;
+import org.apache.pdfbox.pdmodel.interactive.documentnavigation.outline.PDDocumentOutline;
+import org.apache.pdfbox.pdmodel.interactive.documentnavigation.outline.PDOutlineItem;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.FileInputStream;
@@ -90,6 +92,11 @@ public class Typesetter {
 
     public static void main(String[] args) throws IOException {
         mTimeSpentLoadingImages = 0;
+
+        if (args.length != 2) {
+            System.err.println("Usage: Typesetter input.md output.pdf");
+            System.exit(1);
+        }
 
         // Load and parse the Markdown file.
         Stopwatch stopwatch = Stopwatch.createStarted();
@@ -556,6 +563,26 @@ public class Typesetter {
         drawHeadline(page, config, sections, fontManager, contents);
 
         contents.close();
+
+        // Add an outline link to this page if it's the start of an interesting section.
+        SectionBookmark sectionBookmark = sections.getSectionBookmark(page.getPhysicalPageNumber());
+        if (sectionBookmark != null) {
+            SectionBookmark.Type type = sectionBookmark.getType();
+            if (type == SectionBookmark.Type.CHAPTER || type == SectionBookmark.Type.PART ||
+                    type == SectionBookmark.Type.INDEX || type == SectionBookmark.Type.MINOR_SECTION ||
+                    type == SectionBookmark.Type.TABLE_OF_CONTENTS) {
+
+                PDOutlineItem outlineItem = new PDOutlineItem();
+                outlineItem.setTitle(sectionBookmark.getName());
+                outlineItem.setDestination(pdPage);
+                PDDocumentOutline documentOutline = pdDoc.getDocumentCatalog().getDocumentOutline();
+                if (documentOutline == null) {
+                    documentOutline = new PDDocumentOutline();
+                    pdDoc.getDocumentCatalog().setDocumentOutline(documentOutline);
+                }
+                documentOutline.addLast(outlineItem);
+            }
+        }
     }
 
     /**

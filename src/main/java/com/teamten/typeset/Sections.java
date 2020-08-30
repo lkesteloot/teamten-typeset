@@ -103,6 +103,13 @@ public class Sections {
     }
 
     /**
+     * Gets the section bookmark for the physical page number, or null if that page doesn't start a section.
+     */
+    public SectionBookmark getSectionBookmark(int physicalPageNumber) {
+        return mPageToSectionMap.get(physicalPageNumber);
+    }
+
+    /**
      * Returns an ordered sequence of the sections in this document. The integer key is the
      * physical page number.
      */
