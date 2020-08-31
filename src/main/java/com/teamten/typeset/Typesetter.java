@@ -24,6 +24,7 @@ import com.teamten.font.FontPack;
 import com.teamten.font.PdfBoxFontManager;
 import com.teamten.font.SizedFont;
 import com.teamten.font.TrackingFont;
+import com.teamten.font.TypefaceVariantSize;
 import com.teamten.hyphen.HyphenDictionary;
 import com.teamten.markdown.Block;
 import com.teamten.markdown.BlockType;
@@ -597,7 +598,7 @@ public class Typesetter {
         }
 
         long marginTop = IN.toSp(2.0);
-        SizedFont titleFont = fontManager.get(config.getFont(Config.Key.HALF_TITLE_PAGE_TITLE_FONT));
+        SizedFont titleFont = getRequiredFont(fontManager, config, Config.Key.HALF_TITLE_PAGE_TITLE_FONT);
         titleFont = TrackingFont.create(titleFont, 0.1, 0.5);
 
         // Assume we're at the very beginning of the book, and we want an entire blank page at the front.
@@ -614,6 +615,23 @@ public class Typesetter {
         horizontalList.addElement(new Penalty(-Penalty.INFINITY));
         horizontalList.format(verticalList, config.getBodyWidth());
         verticalList.setBaselineSkip(oldLeading);
+
+        // Subtitle
+        String subtitle = config.getString(Config.Key.SUBTITLE);
+        if (subtitle != null) {
+            verticalList.addElement(new Box(0, IN.toSp(1.0), 0));
+
+            SizedFont subtitleFont = getRequiredFont(fontManager, config, Config.Key.HALF_TITLE_PAGE_SUBTITLE_FONT);
+            subtitleFont = TrackingFont.create(subtitleFont, 0.1, 0.5);
+
+            leading = PT.toSp(subtitleFont.getSize()*1.2f);
+            oldLeading = verticalList.setBaselineSkip(leading);
+            horizontalList = HorizontalList.centered();
+            horizontalList.addText(subtitle, subtitleFont, null);
+            horizontalList.addElement(new Penalty(-Penalty.INFINITY));
+            horizontalList.format(verticalList, config.getBodyWidth());
+            verticalList.setBaselineSkip(oldLeading);
+        }
     }
 
     /**
@@ -623,6 +641,7 @@ public class Typesetter {
                                    FontManager fontManager) throws IOException {
 
         String title = config.getString(Config.Key.TITLE);
+        String subtitle = config.getString(Config.Key.SUBTITLE);
         String author = config.getString(Config.Key.AUTHOR);
         String publisherName = config.getString(Config.Key.PUBLISHER_NAME);
         String publisherLocation = config.getString(Config.Key.PUBLISHER_LOCATION);
@@ -632,6 +651,7 @@ public class Typesetter {
 
         long marginTop = IN.toSp(0.5);
         long titleMargin = IN.toSp(1.5);
+        long subtitleMargin = IN.toSp(0.75);
         long publisherMargin = IN.toSp(3.5);
         long publisherLocationMargin = IN.toSp(0.02);
         SizedFont authorFont = fontManager.get(config.getFont(Config.Key.TITLE_PAGE_AUTHOR_FONT));
@@ -663,6 +683,24 @@ public class Typesetter {
         horizontalList.addElement(new Penalty(-Penalty.INFINITY));
         horizontalList.format(verticalList, config.getBodyWidth());
         verticalList.setBaselineSkip(oldLeading);
+
+        // Subtitle.
+        if (subtitle != null) {
+            verticalList.addElement(new Box(0, subtitleMargin, 0));
+
+            SizedFont subtitleFont = getRequiredFont(fontManager, config, Config.Key.TITLE_PAGE_SUBTITLE_FONT);
+            subtitleFont = TrackingFont.create(subtitleFont, 0.1, 0.5);
+
+            leading = PT.toSp(subtitleFont.getSize()*1.2f);
+            oldLeading = verticalList.setBaselineSkip(leading);
+            horizontalList = HorizontalList.centered();
+            horizontalList.addText(subtitle, subtitleFont, null);
+            horizontalList.addElement(new Penalty(-Penalty.INFINITY));
+            horizontalList.format(verticalList, config.getBodyWidth());
+            verticalList.setBaselineSkip(oldLeading);
+
+            publisherMargin -= subtitleMargin + leading;
+        }
 
         if (publisherName != null) {
             verticalList.addElement(new Box(0, publisherMargin, 0));
@@ -1062,6 +1100,19 @@ public class Typesetter {
                 headlineFont.draw(headlineLabel, x, y, contents);
             }
         }
+    }
+
+    /**
+     * Get the specified font, failing the program if it was not defined.
+     */
+    private SizedFont getRequiredFont(FontManager fontManager, Config config, Config.Key fontKey) {
+        TypefaceVariantSize typefaceVariantSize = config.getFont(fontKey);
+        if (typefaceVariantSize == null) {
+            System.err.println("Must specify font for " + fontKey);
+            System.exit(1);
+        }
+
+        return fontManager.get(typefaceVariantSize);
     }
 }
 

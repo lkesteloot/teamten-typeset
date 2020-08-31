@@ -65,6 +65,7 @@ public class Config {
     public enum Key {
         // Strings.
         TITLE(KeyType.STRING),
+        SUBTITLE(KeyType.STRING),
         AUTHOR(KeyType.STRING),
         PUBLISHER_NAME(KeyType.STRING),
         PUBLISHER_LOCATION(KeyType.STRING),
@@ -88,8 +89,10 @@ public class Config {
         INPUT_FONT(KeyType.FONT),
         HEADLINE_FONT(KeyType.FONT),
         HALF_TITLE_PAGE_TITLE_FONT(KeyType.FONT),
+        HALF_TITLE_PAGE_SUBTITLE_FONT(KeyType.FONT),
         TITLE_PAGE_AUTHOR_FONT(KeyType.FONT),
         TITLE_PAGE_TITLE_FONT(KeyType.FONT),
+        TITLE_PAGE_SUBTITLE_FONT(KeyType.FONT),
         TITLE_PAGE_PUBLISHER_NAME_FONT(KeyType.FONT),
         TITLE_PAGE_PUBLISHER_LOCATION_FONT(KeyType.FONT),
         COPYRIGHT_PAGE_COPYRIGHT_FONT(KeyType.FONT),
