@@ -136,6 +136,7 @@ For example:
 The following variables have arbitrary text for values:
 
     Title
+    Subtitle (optional)
     Author
     Publisher-Name
     Publisher-Location (e.g., "London, England")
@@ -173,8 +174,10 @@ the size is a real number followed by a unit, one of
     Input-Font
     Headline-Font
     Half-Title-Page-Title-Font
+    Half-Title-Page-Subtitle-Font
     Title-Page-Author-Font
     Title-Page-Title-Font
+    Title-Page-Subtitle-Font
     Title-Page-Publisher-Name-Font
     Title-Page-Publisher-Location-Font
     Copyright-Page-Copyright-Font
