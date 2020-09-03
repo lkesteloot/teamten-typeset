@@ -130,10 +130,7 @@ public class Typesetter {
         }
 
         // Post-process the blocks to replace apostrophes, quotes, etc.
-        String language = config.getString(Config.Key.LANGUAGE);
-        if (language == null) {
-            language = "en_US";
-        }
+        String language = config.getString(Config.Key.LANGUAGE, "en_US");
         for (Block block : doc.getBlocks()) {
             block.postProcessText(language);
         }
@@ -772,14 +769,13 @@ public class Typesetter {
     private void generateTableOfContents(Config config, Sections sections, VerticalList verticalList,
                                          FontManager fontManager) throws IOException {
 
+        boolean isClassic = config.getString(Config.Key.TOC_STYLE, Config.TOC_STYLE_CLASSIC).equalsIgnoreCase(Config.TOC_STYLE_CLASSIC);
+
         long marginTop = IN.toSp(0.6);
         long paddingBelowTitle = IN.toSp(0.75);
         boolean hasParts = sections.hasParts();
 
-        String tocTitle = config.getString(Config.Key.TOC_TITLE);
-        if (tocTitle == null) {
-            tocTitle = "Table of Contents";
-        }
+        String tocTitle = config.getString(Config.Key.TOC_TITLE, "Table of Contents");
 
         SizedFont titleFont = fontManager.get(config.getFont(Config.Key.TOC_PAGE_TITLE_FONT));
         titleFont = TrackingFont.create(titleFont, 0.1, 0.5);
@@ -823,7 +819,7 @@ public class Typesetter {
         // If we let each page number take as much space as it wants, then the dots of the leaders
         // won't line up on the right. This looks bad and real books don't do this. So we must guess
         // the widest page number and make them all take that much space.
-        String widestPageNumber = "888";
+        String widestPageNumber = "888"; // Lulu has a max of 740 pages.
         long widestPageNumberWidth = chapterFont.getStringMetrics(widestPageNumber).getWidth();
         // Add some padding.
         widestPageNumberWidth = 11*widestPageNumberWidth/10;
@@ -874,15 +870,18 @@ public class Typesetter {
                 // Intra-entry margin.
                 verticalList.addElement(new Glue(Math.max(previousMarginBelow, marginAbove), 0, 0, false));
 
-                horizontalList = new HorizontalList();
-                if (indent > 0) {
-                    horizontalList.addElement(new Box(indent, 0, 0));
-                }
+                horizontalList = HorizontalList.raggedRight();
                 horizontalList.addText(name, sectionNameFont, null);
-                horizontalList.addElement(leader);
-                horizontalList.addElement(HBox.rightAligned(new Text(pageLabel, chapterFont), widestPageNumberWidth));
-                horizontalList.addElement(new Penalty(-Penalty.INFINITY));
-                horizontalList.format(verticalList, config.getBodyWidth());
+                if (isClassic) {
+                    horizontalList.addElement(leader);
+                    horizontalList.addElement(HBox.rightAligned(new Text(pageLabel, chapterFont), widestPageNumberWidth));
+                    horizontalList.addElement(new Penalty(-Penalty.INFINITY));
+                } else {
+                    horizontalList.addText("\u00A0\u00A0\u00A0" + pageLabel, chapterFont, null);
+                    horizontalList.addEndOfParagraph();
+                }
+                horizontalList.format(verticalList,
+                        OutputShape.singleLine(config.getBodyWidth(), indent, indent + PT.toSp(entryFontSize)));
 
                 previousMarginBelow = marginBelow;
             }

@@ -20,6 +20,8 @@ package com.teamten.typeset;
 
 import com.teamten.font.Typeface;
 import com.teamten.font.TypefaceVariantSize;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -29,6 +31,9 @@ import java.util.Map;
  * book, font descriptions, and page sizes.
  */
 public class Config {
+    public static final String TOC_STYLE_CLASSIC = "Classic";
+    public static final String TOC_STYLE_MODERN = "Modern";
+
     /**
      * See {@link KeyType} for valid values.
      */
@@ -72,6 +77,7 @@ public class Config {
         COPYRIGHT(KeyType.STRING),
         COLOPHON(KeyType.STRING),
         TOC_TITLE(KeyType.STRING),
+        TOC_STYLE(KeyType.STRING), // "Classic" or "Modern", see TOC_STYLE_ constants above.
         INDEX_TITLE(KeyType.STRING),
         LANGUAGE(KeyType.STRING),
 
@@ -156,7 +162,8 @@ public class Config {
      * Fill the configuration with default values so that each document doesn't have to define them all.
      */
     public void fillWithDefaults() {
-        add(Key.LANGUAGE, "en");
+        add(Key.LANGUAGE, "en_US");
+        add(Key.TOC_STYLE, TOC_STYLE_CLASSIC);
         add(Key.PAGE_WIDTH, "8.5in");
         add(Key.PAGE_HEIGHT, "11in");
         add(Key.PAGE_MARGIN_TOP, "6pc");
@@ -262,12 +269,23 @@ public class Config {
      *
      * @throws IllegalArgumentException if the key is not for strings.
      */
-    public String getString(Key key) {
+    public @Nullable String getString(Key key) {
         if (key.getKeyType() != KeyType.STRING) {
             throw new IllegalArgumentException("key " + key + " is for " + key.getKeyType());
         }
 
         return (String) mMetadata.get(key);
+    }
+
+    /**
+     * Gets the string value for the key, or the provided default value if not in the configuration.
+     *
+     * @throws IllegalArgumentException if the key is not for strings.
+     */
+    public @NotNull String getString(Key key, String defaultValue) {
+        String value = getString(key);
+
+        return value == null ? defaultValue : value;
     }
 
     /**

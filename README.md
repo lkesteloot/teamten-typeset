@@ -147,6 +147,11 @@ The following variables have arbitrary text for values:
 
 The language sets which hyphenation dictionary is used.
 
+The `Toc-Style` variable is a string that can be either `Classic`
+(the default) or `Modern`. Classic style has right-aligned page
+numbers with a leader of dots from the chapter title. Modern
+style has the page numbers right after the chapter titles.
+
 The following variables have font values. Font have the format
 `typeface, variant, size`, where `typeface` is registered
 in the `font/Typeface` class, `variant` is one of `regular`,
